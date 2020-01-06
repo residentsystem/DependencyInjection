@@ -1,0 +1,166 @@
+﻿@page
+@model IndexModel3
+@{
+}
+
+<div class="container intro">
+    <section class="row col-sm-12">
+        <article class="col-sm-12 col-md-12 col-lg-12">
+            <header>
+                <h1>Constructor Injection</h1>
+            </header>
+        </article>
+    </section>
+</div>
+
+<div class="container">
+    <section class="row col-sm-12">
+        <article class="col-sm-12 col-md-12 col-lg-12">
+            <div class="box-display">
+                <p>
+                    Looking at both mail services, we can see that there is a generic method that both services provide. 
+                    The method (CreateMailAccount) that creates a mail account can provide an abstraction of the mail service, 
+                    which is going to be used even when we do not know which exact service (Google or Outlook) is to be used.
+                </p>
+
+                <p>
+                    First we need an interface (IEmailService) that will defines the method that both services provide to the 
+                    application. Then the corresponding services (classes) must inherit from that interface.
+                </p>
+
+                <h2>IEmailService.cs</h2>
+
+                <pre>
+                    <code>
+                        public interface IEmailService
+                        {
+                            public string CreateMailAccount(string username);
+                        }
+                    </code>
+                </pre>
+
+                <h2>GoogleMailService.cs</h2>
+
+                <pre>
+                    <code>
+                        public class GoogleMailService : IEmailService
+                        {
+                            public string CreateMailAccount(string username)
+                            {
+                                var domain = "&#64;gmail.com";
+                                return $"\nEmail \"{username}{domain}\" has been created successfuly.\n";
+                            }
+                        }
+                    </code>
+                </pre>
+
+                <h2>OutlookMailService.cs</h2>
+
+                <pre>
+                    <code>
+                        public class OutlookMailService : IEmailService
+                        {
+                            public string CreateMailAccount(string username)
+                            {
+                                string domain = "&#64;outlook.com";
+                                return $"\nEmail \"{username}{domain}\" has been created successfuly.\n";
+                            }
+                        }
+                    </code>
+                </pre>
+
+                <p>
+                    The abstraction can now be used in the main class. We can inject it using a type of dependency injection 
+                    known as constructor injection. Constructor injection is done by supplying the dependency through the class 
+                    constructor.
+                </p>
+
+                <h2>Index3.cshtml.cs</h2>
+
+                <pre>
+                    <code>
+                        public class IndexModel3 : PageModel
+                        {
+                            private IEmailService _emailservice;
+
+                            public IndexModel3(IEmailService emailservice)
+                            {
+                                _emailservice = emailservice;
+                            }
+
+                            public string CreateNewEmail(string username)
+                            {
+                                return _emailservice.CreateMailAccount(username);
+                            }
+                        }
+                    </code>
+                </pre>
+
+                <p>
+                    The code that is calling the main class would have to specify what mail service is going to be used 
+                    and pass it in the constructor when instantiating that class.
+                </p>
+
+                <pre>
+                    <code>
+                        public void OnGet()
+                        {
+                            GoogleMailService googleMailService = new GoogleMailService();
+                            IndexModel3 indexModel3 = new IndexModel3(googleMailService);
+
+                            EmailConfirmation = indexModel3.CreateNewEmail(_useraccount.Username);
+                        }
+                    </code>
+                </pre>
+
+                <h2>Startup.cs</h2>
+
+                <p>
+                    Finally, IMailService must be registered in the service container. The interface is registered in the ConfigureServices 
+                    method of the Startup class with the concrete type GoogleMailService and OutlookMailService. Singleton services are 
+                    created only once per application and then used for the entire application lifetime.
+                </p>
+
+                <pre>
+                    <code>
+                        public void ConfigureServices(IServiceCollection services)
+                        {
+                            services.AddSingleton&lt;IEmailService, GoogleMailService&gt;();
+                            services.AddSingleton&lt;IEmailService, OutlookMailService&gt;();
+                        }
+                    </code>
+                </pre>
+
+                <div class="confirmation">
+                    <p>@Model.UserConfirmation</p>
+                    <p>@Model.EmailConfirmation</p>
+                </div>
+
+                <p>
+                    Because the binding takes place outside of the main class, the code is now much more maintainable. Switching to 
+                    Outlook now only requires instantiating that service instead and pass it to the main class constructor.    
+                </p>
+
+                <pre>
+                    <code>
+                        public void OnGet()
+                        {
+                            OutlookMailService outlookMailService = new OutlookMailService();
+                            IndexModel3 indexModel3 = new IndexModel3(outlookMailService);
+                        }
+                    </code>
+                </pre>
+            </div>
+            <div class="box-display">
+                <ul>
+                    <li>
+                        <a href="/Index2">Previous</a>
+                    </li>
+                    <li>
+                        <a href="/Index4">Next</a>
+                    </li>
+                </ul>
+            </div>
+        </article>
+    </section>
+</div>

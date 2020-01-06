@@ -1,0 +1,100 @@
+﻿@page
+@model IndexModel
+@{
+}
+
+<div class="container intro">
+    <section class="row col-sm-12">
+        <article class="col-sm-12 col-md-12 col-lg-12">
+            <header>
+                <h1>Dependency Injection</h1>
+            </header>
+        </article>
+    </section>
+</div>
+
+<div class="container">
+    <section class="row col-sm-12">
+        <article class="col-sm-12 col-md-12 col-lg-12">
+            <div class="box-display">
+                <p>
+                    Dependency Injection is an object-oriented programming design pattern that allows the creation of loosely coupled 
+                    code. It allows the creation and binding of dependent objects outside of the class that depends on them. You can 
+                    use an interface to break the dependencies between the main class and the service classe. In this case, both classes 
+                    depend on the interface and no longer on each other. The purpose of dependency injection is to make the code 
+                    maintainable and easy to update.
+                </p>
+
+                <p>
+                    The code in this application simulate the creation of a user account and use the username as the parameter to 
+                    create an email account. This application simply return a confirmation message has if the objects were really 
+                    created. The main class (IndexModel) needs a service classe to create a mail account. Then we introduce an interface, 
+                    and make sure the main class is aware of the abstraction rather than instantiating the classe directly. 
+                </p>
+
+                <p>
+                    This way, you can change the implementation of the interface at any time (and for many times you want) without
+                    changing the code in the main class that depends on it. In the example below, the mail service is provided 
+                    in a traditional way (without an interface).
+                </p>
+
+                <h2>Index.cshtml.cs</h2>
+
+                <pre>
+                    <code>
+                        private GoogleMailService _googlemailservice;
+
+                        public IndexModel()
+                        {
+                            _googlemailservice = new GoogleMailService();
+                        }
+
+                        public void OnGet()
+                        {
+                            EmailConfirmation = _googlemailservice.CreateMailAccount(_useraccount.Username);
+                        }
+                    </code>
+                </pre>
+
+                <h2>GoogleMailService.cs</h2>
+
+                <pre>
+                    <code>
+                        public class GoogleMailService
+                        {
+                            public string CreateMailAccount(string username)
+                            {
+                                var domain = "&#64;gmail.com";
+                                return $"\nEmail \"{username}{domain}\" has been created successfuly.\n";
+                            }
+                        }
+                    </code>
+                </pre>
+
+                <p>
+                    Here we get the confirmation message as if we were creating a Google mail account. It doesn't matter if a real 
+                    account gets created at this point, we simply need a basic class to apply the dependency later.
+                </p>
+
+                <div class="confirmation">
+                    <p>@Model.UserConfirmation</p>
+                    <p>@Model.EmailConfirmation</p>
+                </div>
+
+                <p>
+                    The code is working but this is not the right way to do things because a lot of code would have to 
+                    be modified if a new mail service was to be implemented. The next section will show an example.
+                </p>
+            </div>
+
+            <div class="box-display">
+                <ul>
+                    <li>
+                        <a href="/Index2">Next</a>
+                    </li>
+                </ul>
+            </div>
+
+        </article>
+    </section>
+</div>

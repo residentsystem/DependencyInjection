@@ -1,0 +1,79 @@
+﻿@page
+@model IndexModel4
+@{
+}
+
+<div class="container intro">
+    <section class="row col-sm-12">
+        <article class="col-sm-12 col-md-12 col-lg-12">
+            <header>
+                <h1>Setter Injection</h1>
+            </header>
+        </article>
+    </section>
+</div>
+
+<div class="container">
+    <section class="row col-sm-12">
+        <article class="col-sm-12 col-md-12 col-lg-12">
+            <div class="box-display">
+
+                <p>
+                    The abstraction can also be injected using another type of dependency injection named setter injection. 
+                    Setter or property injection is done by supplying the dependency through the property set accessor.
+                </p>
+
+                <h2>Index4.cshtml.cs</h2>
+
+                <pre>
+                    <code>
+                        public class IndexModel3 : PageModel
+                        {
+                            private IEmailService _emailservice;
+
+                            public IEmailService EmailService {
+                            get {
+                                return _emailservice;
+                            }
+                            set {
+                                _emailservice = value;
+                            }
+                        }
+                        }
+                    </code>
+                </pre>
+
+                <p>
+                    The code that is calling the main class would have to specify what mail service is going to be used 
+                    and pass it to the property.
+                </p>
+
+                <pre>
+                    <code>
+                        public void OnGet()
+                        {
+                            GoogleMailService googleMailService = new GoogleMailService();
+                            EmailService = googleMailService;
+                            EmailConfirmation = EmailService.CreateMailAccount(_useraccount.Username);
+                        }
+                    </code>
+                </pre>
+
+                <div class="confirmation">
+                    <p>@Model.UserConfirmation</p>
+                    <p>@Model.EmailConfirmation</p>
+                </div>
+            </div>
+            <div class="box-display">
+                <ul>
+                    <li>
+                        <a href="/Index3">Previous</a>
+                    </li>
+                    <li>
+                        <a href="/Index5">Next</a>
+                    </li>
+                </ul>
+            </div>
+        </article>
+    </section>
+</div>
